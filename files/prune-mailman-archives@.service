@@ -1,0 +1,6 @@
+[Service]
+Type=oneshot
+Environment=PRUNE_DAYS=14
+EnvironmentFile=-/etc/mailman/prune/%i.config
+WorkingDirectory=/usr/lib/mailman/bin
+ExecStart=/usr/lib/mailman/bin/prune_arch -l %i -v -d $PRUNE_DAYS

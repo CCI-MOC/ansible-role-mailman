@@ -1,0 +1,11 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Check var
+      assert:
+        that: not manage_services
+
+    - name: "Include ansible-role-mailman"
+      include_role:
+        name: "ansible-role-mailman"

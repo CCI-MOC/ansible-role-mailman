@@ -1,0 +1,28 @@
+- name: Verify
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: gather package facts
+      package_facts:
+
+    - name: check that mailman has been installed
+      assert:
+        that: >-
+          "mailman" in ansible_facts.packages
+
+    - name: check that unit files are installed [1]
+      stat:
+        path: "{{ item }}"
+      register: unit_check
+      loop:
+        - /etc/systemd/system/prune-mailman-archives@.service
+        - /etc/systemd/system/prune-mailman-archives@.timer
+
+    - name: check that unit files are installed [2]
+      assert:
+        quiet: true
+        that: item.stat.exists
+      loop: "{{ unit_check.results }}"
+      loop_control:
+        label: "{{ item.item }}"

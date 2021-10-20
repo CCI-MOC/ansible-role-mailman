@@ -1,0 +1,33 @@
+- name: install mailman
+  become: true
+  package:
+    name: "{{ mailman_packages }}"
+    state: installed
+
+- name: install prune_arch script
+  become: true
+  copy:
+    src: prune_arch
+    dest: /usr/lib/mailman/bin/prune_arch
+    mode: "0755"
+
+- name: install systemd units
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "{{ systemd_unit_dir }}/{{ item }}"
+    mode: "0644"
+  loop:
+    - prune-mailman-archives@.service
+    - prune-mailman-archives@.timer
+  notify: reload systemd
+
+- name: activate timers
+  become: true
+  when: manage_services|default(true)|bool
+  service:
+    use: systemd
+    name: "prune-mailman-archives@{{ item }}.timer"
+    enabled: true
+    state: started
+  loop: "{{ mailman_prune_lists|default([]) }}"

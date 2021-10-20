@@ -1,0 +1,4 @@
+roles:
+    - name: systemd
+      src: https://github.com/cci-moc/ansible-role-systemd
+      version: master
